@@ -1,7 +1,12 @@
 [project]
-name = "agent-terminal"
+name = "chat-terminal"
 version = "0.1.0"
-description = "Add your description here"
+description = "lightweighted but necessary terminal chatbot."
 readme = "README.md"
-requires-python = ">=3.11"
-dependencies = []
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=1.2.3",
+    "langchain-ollama>=1.0.1",
+    "langgraph>=1.0.5",
+    "rich>=14.2.0",
+]
