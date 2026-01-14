@@ -10,6 +10,10 @@ def main():
     graph = graph.compile()
 
     # print(graph.get_graph().draw_ascii())
+    with open("graph.png", "wb") as f:
+        f.write(
+            graph.get_graph().draw_mermaid_png(draw_method=MermaidDrawMethod.PYPPETEER)
+        )
 
     graph.invoke({})
 
