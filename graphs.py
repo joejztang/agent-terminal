@@ -5,7 +5,7 @@ from langgraph.graph import END, START, StateGraph
 from flow_controls import simple_after_ai_response, simple_after_ask
 from nodes import ai_response, ask, initialize_state
 from states import SimpleState
-from util import EXIT
+from util import CONTINUE, EXIT
 
 
 def simple_chat(llm: Any) -> StateGraph:
@@ -23,6 +23,7 @@ def simple_chat(llm: Any) -> StateGraph:
         simple_after_ask,
         {
             "ai_response": "ai_response",
+            CONTINUE: "ask",
             EXIT: END,
         },
     )
@@ -32,6 +33,7 @@ def simple_chat(llm: Any) -> StateGraph:
         simple_after_ai_response,
         {
             "ask": "ask",
+            CONTINUE: "ask",
             EXIT: END,
         },
     )

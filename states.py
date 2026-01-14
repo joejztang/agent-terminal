@@ -5,3 +5,4 @@ from langgraph.graph import MessagesState
 
 class SimpleState(MessagesState):
     decision: str
+    verbose: bool

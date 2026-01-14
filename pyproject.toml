@@ -5,8 +5,10 @@ description = "lightweighted but necessary terminal chatbot."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "grandalf>=0.8",
     "langchain>=1.2.3",
     "langchain-ollama>=1.0.1",
     "langgraph>=1.0.5",
+    "pyppeteer>=2.0.0",
     "rich>=14.2.0",
 ]

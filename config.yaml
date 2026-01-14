@@ -1,2 +1,3 @@
 user-prompt-format: "[bold cyan]You[/bold cyan]"
 ai-prompt-format: "[bold green]AI[/bold green]"
+verbose-color: "bold yellow"
