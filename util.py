@@ -8,6 +8,9 @@ with open("config.yaml", "r") as f:
 
 EXIT = "exit"
 CONTINUE = "continue"
+UPLOAD = "upload_to_vectordb"
+FETCH = "fetch_from_vectordb"
+NO_ACTION = "none"
 
 
 def catch_interruption(func):

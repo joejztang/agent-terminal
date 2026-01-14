@@ -3,3 +3,4 @@ langgraph
 rich
 langchain-ollama
 pyppeteer
+beautifulsoup4
