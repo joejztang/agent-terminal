@@ -3,6 +3,6 @@ from typing import TypedDict
 from langgraph.graph import MessagesState
 
 
-class SimpleState(MessagesState):
+class AgentState(MessagesState):
     decision: str
     verbose: bool
