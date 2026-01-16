@@ -2,9 +2,9 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.runnables.graph import MermaidDrawMethod
 from rich.prompt import Prompt
 
-from graphs import agent_graph
-from llms import ministral_3_14b
-from util import (
+from src.agent.graphs import agent_graph
+from src.agent.llms import ministral_3_14b
+from src.utils.util import (
     check_quit,
     check_verbose_command,
     config,

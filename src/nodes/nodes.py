@@ -3,8 +3,8 @@ from typing import Any
 from langchain.messages import AIMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 
-from states import AgentState
-from util import CONTINUE, EXIT, catch_interruption, config, console
+from src.agent.states import AgentState
+from src.utils.util import CONTINUE, EXIT, catch_interruption, config, console
 
 
 @catch_interruption
@@ -32,7 +32,6 @@ def router(state: AgentState, llm: Any) -> AgentState:
 
 @catch_interruption
 def upload_to_vectordb(state: AgentState) -> AgentState:
-    # Placeholder for upload logic
     console.print("Uploading document to vector database...", style="yellow")
     return {"messages": []}
 

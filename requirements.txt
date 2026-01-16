@@ -4,3 +4,5 @@ rich
 langchain-ollama
 pyppeteer
 beautifulsoup4
+langchain-community
+langchain-text-splitters

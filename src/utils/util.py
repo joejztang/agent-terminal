@@ -1,11 +1,16 @@
+from pathlib import Path
+
 from rich.console import Console
 from yaml import safe_load
 
-from states import AgentState
+from src.agent.states import AgentState
+
+file_path = Path(__file__).resolve()
+parent_directory = file_path.parent
 
 console = Console()
 
-with open("config.yaml", "r") as f:
+with open(f"{parent_directory}/config.yaml", "r") as f:
     config = safe_load(f)
 
 EXIT = "exit"
@@ -13,6 +18,8 @@ CONTINUE = "continue"
 UPLOAD = "upload_to_vectordb"
 FETCH = "fetch_from_vectordb"
 NO_ACTION = "none"
+
+MAX_DEPTH = 2
 
 
 def initialize_state() -> AgentState:
