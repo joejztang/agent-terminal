@@ -31,9 +31,9 @@ def web_scrape(url: str) -> List[Document]:
     return docs
 
 
-@tool
-def process_html(url):
+def process_html(url) -> List[Document]:
     docs = web_scrape(url)
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     texts = text_splitter.split_documents(docs)
+    return texts

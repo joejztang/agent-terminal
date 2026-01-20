@@ -3,7 +3,7 @@ from langchain_core.runnables.graph import MermaidDrawMethod
 from rich.prompt import Prompt
 
 from src.agent.graphs import agent_graph
-from src.agent.llms import ministral_3_14b
+from src.agent.llms import qwen3_8b
 from src.utils.util import (
     check_quit,
     check_verbose_command,
@@ -15,7 +15,7 @@ from src.utils.util import (
 
 
 def main():
-    llm = ministral_3_14b
+    llm = qwen3_8b
     graph = agent_graph(llm)
 
     print(graph.get_graph().draw_ascii())
