@@ -1,20 +1,14 @@
 from typing import Any, List
 
-from langchain.messages import AIMessage, SystemMessage
+from langchain.messages import AIMessage
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
-from pydantic import BaseModel
 
+from src.agent.schemas import RouterOutput
 from src.agent.states import AgentState
 from src.utils.document import process_html
 from src.utils.store import vector_store
 from src.utils.util import CONTINUE, EXIT, catch_interruption, config, console
-
-
-class RouterOutput(BaseModel):
-    query: List[str]
-    intent: List[str]
-    urls: List[str]
 
 
 @catch_interruption
@@ -37,7 +31,9 @@ def router(state: AgentState, llm: Any) -> AgentState:
     structured_llm = llm.with_structured_output(RouterOutput)
     simple_router = route_prompt | structured_llm
     response = simple_router.invoke({"question": query})
-    print(response)
+
+    if state.get("verbose", False):
+        console.print(f"Router response: {response}", style=config.get("verbose-color"))
 
     if response.intent[-1] == "none":
         state["content"] = []

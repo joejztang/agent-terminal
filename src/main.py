@@ -1,5 +1,5 @@
+from art import tprint
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.runnables.graph import MermaidDrawMethod
 from rich.prompt import Prompt
 
 from src.agent.graphs import agent_graph
@@ -18,11 +18,8 @@ def main():
     llm = qwen3_8b
     graph = agent_graph(llm)
 
-    print(graph.get_graph().draw_ascii())
-    # with open("graph.png", "wb") as f:
-    #     f.write(
-    #         graph.get_graph().draw_mermaid_png(draw_method=MermaidDrawMethod.PYPPETEER)
-    #     )
+    # print(graph.get_graph().draw_ascii())
+
     state = initialize_state()
     while True:
         user_input = Prompt.ask(config["user-prompt-format"])
@@ -52,4 +49,5 @@ def main():
 
 
 if __name__ == "__main__":
+    tprint("agent-terminal")
     main()
