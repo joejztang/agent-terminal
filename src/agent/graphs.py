@@ -23,6 +23,7 @@ def agent_graph(llm: Any) -> StateGraph:
     graph.add_node("fetch_from_vectordb", fetch_from_vectordb)
 
     graph.add_edge(START, "router")
+    graph.add_edge("fetch_from_vectordb", "ai_response")
     graph.add_conditional_edges(
         "router",
         after_router,

@@ -37,30 +37,40 @@ def router(state: AgentState, llm: Any) -> AgentState:
     structured_llm = llm.with_structured_output(RouterOutput)
     simple_router = route_prompt | structured_llm
     response = simple_router.invoke({"question": query})
-    # return {"messages": [AIMessage(content=response.content)]}
-    console.print(f"Router response: {response}", style="yellow")
+    print(response)
+
+    if response.intent[-1] == "none":
+        state["content"] = []
+
     return {"intent": response.intent, "urls": response.urls}
 
 
 @catch_interruption
 def upload_html_to_vectordb(state: AgentState) -> AgentState:
-    console.print("uploading information from vector database...", style="yellow")
-    return {"messages": []}
-    # documents: List[Document] = process_html(state["urls"][-1])
-    # vector_store.add_documents(documents)
-    # return {"messages": [AIMessage(content="Document uploaded successfully.")]}
+    # Chroma is different from pgvector
+    documents: List[Document] = process_html(state["urls"][-1])
+    vector_store.add_documents(documents)
+    return {"messages": [AIMessage(content="Document uploaded successfully.")]}
 
 
 @catch_interruption
 def fetch_from_vectordb(state: AgentState) -> AgentState:
-    # Placeholder for fetch logic
-    console.print("Fetching information from vector database...", style="yellow")
-    return {"messages": []}
+    query = state["messages"][-1].content
+    results = vector_store.similarity_search(query, k=3)
+    contents = [doc.page_content for doc in results]
+    return {"content": contents}
 
 
 @catch_interruption
 def ai_response(state: AgentState, llm: Any) -> AgentState:
-    response = llm.invoke(state["messages"])
+    rag_prompt = f"""Context: {state['content'][-1]}
+    
+    Based on the above context, answer this question: {state['messages'][-1].content}"""
+
+    if not state["content"]:
+        response = llm.invoke(state["messages"])
+    else:
+        response = llm.invoke(rag_prompt)
 
     if state.get("verbose", False):
         console.print(state, style=config.get("verbose-color"))

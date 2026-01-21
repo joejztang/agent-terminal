@@ -5,9 +5,8 @@ from src.utils.util import CONTINUE, EXIT, FETCH, NO_ACTION, UPLOAD, catch_inter
 def after_router(state: AgentState) -> str:
     if state.get("decision") is EXIT:
         return EXIT
-    action = state["messages"][-1].content.strip()
-    if action in [UPLOAD, FETCH, NO_ACTION]:
-        return action
+    if state.get("intent")[-1] in [UPLOAD, FETCH, NO_ACTION]:
+        return state["intent"][-1]
     return NO_ACTION
 
 

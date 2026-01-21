@@ -9,3 +9,4 @@ class AgentState(MessagesState):
     verbose: bool
     intent: Annotated[list[str], operator.add]
     urls: Annotated[list[str], operator.add]
+    content: List[str]
