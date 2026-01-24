@@ -27,6 +27,7 @@ def initialize_state() -> AgentState:
     state["messages"] = []
     state["decision"] = ""
     state["verbose"] = False
+    state["content"] = []
     return state
 
 

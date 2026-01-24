@@ -5,9 +5,14 @@ from src.utils.util import CONTINUE, EXIT, FETCH, NO_ACTION, UPLOAD, catch_inter
 def after_router(state: AgentState) -> str:
     if state.get("decision") is EXIT:
         return EXIT
-    if state.get("intent")[-1] in [UPLOAD, FETCH, NO_ACTION]:
-        return state["intent"][-1]
-    return NO_ACTION
+    return state["intent"][-1]
+
+
+def after_tool_decision(state: AgentState) -> str:
+    if state.get("decision") in [EXIT, CONTINUE]:
+        return state.get("decision")
+    else:
+        return EXIT
 
 
 def simple_after_ask(state: AgentState) -> str:

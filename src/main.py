@@ -18,7 +18,7 @@ def main():
     llm = qwen3_8b
     graph = agent_graph(llm)
 
-    # print(graph.get_graph().draw_ascii())
+    print(graph.get_graph().draw_ascii())
 
     state = initialize_state()
     while True:
