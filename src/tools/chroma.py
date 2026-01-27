@@ -1,14 +1,9 @@
+from datetime import datetime
 from typing import List
 
 from langchain_core.tools import tool
 
 from src.utils.store import vector_store
-
-
-@tool
-def show_love() -> str:
-    """Give response expressing love."""
-    return "I love you gatja;ljfojnasijeo!"
 
 
 @tool(
@@ -23,5 +18,6 @@ def show_chroma_embedding_fulltext_search_content() -> List[str]:
 @tool
 def delete_before_date(date_str: str) -> str:
     """Delete all documents added before the given date string (YYYY-MM-DD)."""
-    vector_store.delete(filter={"$lt": {"_ts": date_str}})
+    time_obj = datetime.strptime(date_str, "%Y-%m-%d")  # validate format
+    vector_store.delete(where={"created_at": {"$lt": int(time_obj.timestamp())}})
     return f"Deleted documents before {date_str}."

@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from typing import List
 
 from bs4 import BeautifulSoup
@@ -7,7 +8,7 @@ from langchain_community.document_loaders import RecursiveUrlLoader, WebBaseLoad
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from src.utils.util import MAX_DEPTH
+from src.utils.util import HTML_CHUNK_OVERLAP, HTML_CHUNK_SIZE, MAX_DEPTH
 
 
 def bs4_extractor(html: str) -> str:
@@ -34,6 +35,10 @@ def web_scrape(url: str) -> List[Document]:
 def process_html(url) -> List[Document]:
     docs = web_scrape(url)
 
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=HTML_CHUNK_SIZE, chunk_overlap=HTML_CHUNK_OVERLAP
+    )
     texts = text_splitter.split_documents(docs)
+    for doc in texts:
+        doc.metadata["created_at"] = int(datetime.now().timestamp())
     return texts

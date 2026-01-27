@@ -40,12 +40,14 @@ def main():
 
         state = all_responses
 
-        response = ""
+        response = []
         for message in reversed(all_responses["messages"]):
-            if isinstance(message, AIMessage):
-                response = message
+            if not isinstance(message, HumanMessage):
+                response.append(message)
+            else:
                 break
-        console.print(f"{config['ai-prompt-format']}: {response.content}")
+        # TODO: make it pretty
+        console.print(f"{config['ai-prompt-format']}: {response}")
 
 
 if __name__ == "__main__":

@@ -20,6 +20,8 @@ FETCH = "fetch_from_vectordb"
 NO_ACTION = "none"
 
 MAX_DEPTH = 2
+HTML_CHUNK_SIZE = 250
+HTML_CHUNK_OVERLAP = 50
 
 
 def initialize_state() -> AgentState:

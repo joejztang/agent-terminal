@@ -7,28 +7,30 @@ from langchain_core.prompts import ChatPromptTemplate
 import src.tools.chroma as chroma_tools
 from src.agent.schemas import RouterOutput
 from src.agent.states import AgentState
-from src.tools.chroma import show_chroma_embedding_fulltext_search_content, show_love
+from src.tools.chroma import (
+    delete_before_date,
+    show_chroma_embedding_fulltext_search_content,
+)
 from src.utils.document import process_html
 from src.utils.store import vector_store
 from src.utils.util import CONTINUE, EXIT, catch_interruption, config, console
 
+# @catch_interruption
+# def tool_decision(state: AgentState, llm: Any) -> AgentState:
+#     if state.get("decision") in [EXIT, CONTINUE]:
+#         return state
 
-@catch_interruption
-def tool_decision(state: AgentState, llm: Any) -> AgentState:
-    if state.get("decision") in [EXIT, CONTINUE]:
-        return state
+#     llm_with_tools = llm.bind_tools(
+#         [delete_before_date, show_chroma_embedding_fulltext_search_content]
+#     )
+#     result = llm_with_tools.invoke([state["messages"][-1]])
 
-    llm_with_tools = llm.bind_tools(
-        [show_love, show_chroma_embedding_fulltext_search_content]
-    )
-    result = llm_with_tools.invoke([state["messages"][-1]])
+#     if state.get("verbose", False):
+#         console.print(
+#             f"Tool decision result: {result}", style=config.get("verbose-color")
+#         )
 
-    if state.get("verbose", False):
-        console.print(
-            f"Tool decision result: {result}", style=config.get("verbose-color")
-        )
-
-    return {"messages": result}
+#     return {"messages": result}
 
 
 @catch_interruption
@@ -38,23 +40,35 @@ def router(state: AgentState, llm: Any) -> AgentState:
         return state
 
     # tool call check
-    tool_decision_response = state["messages"][-1]
-    if tool_decision_response.tool_calls:
-        for tool_call in tool_decision_response.tool_calls:
-            name = tool_call.get("name")
-            _args = tool_call.get("args")
-            tool_call_id = tool_call.get("id")
+    # tool_decision_response = state["messages"][-1]
+    # if tool_decision_response.tool_calls:
+    #     for tool_call in tool_decision_response.tool_calls:
+    #         name = tool_call.get("name")
+    #         _args = tool_call.get("args")
+    #         tool_call_id = tool_call.get("id")
 
-            structured_tool = getattr(chroma_tools, name, None)
-            if structured_tool is None:
-                raise ValueError(f"Tool {name} not found.")
-            tool_result = structured_tool.run(_args)
+    #         structured_tool = getattr(chroma_tools, name, None)
+    #         if structured_tool is None:
+    #             raise ValueError(f"Tool {name} not found.")
+    #         tool_result = structured_tool.run(_args)
 
-            state["messages"].append(tool_result)
-            state["messages"].append(
-                ToolMessage(content=tool_result, name=name, tool_call_id=tool_call_id)
-            )
-        return {"intent": ["none"], "urls": ["none"]}
+    #         state["messages"].append(tool_result)
+    #         state["messages"].append(
+    #             ToolMessage(content=tool_result, name=name, tool_call_id=tool_call_id)
+    #         )
+    #     return {"intent": ["none"], "urls": ["none"]}
+    llm_with_tools = llm.bind_tools(
+        [delete_before_date, show_chroma_embedding_fulltext_search_content]
+    )
+    tool_result = llm_with_tools.invoke([state["messages"][-1]])
+
+    if state.get("verbose", False):
+        console.print(
+            f"Tool decision result: {tool_result}", style=config.get("verbose-color")
+        )
+
+    if tool_result.tool_calls:
+        return {"messages": [tool_result], "intent": ["tool_calls"], "urls": ["none"]}
 
     query = state["messages"][-1].content.lower()
 
@@ -84,6 +98,7 @@ def router(state: AgentState, llm: Any) -> AgentState:
 @catch_interruption
 def upload_html_to_vectordb(state: AgentState) -> AgentState:
     # Chroma is different from pgvector
+    print(state)
     documents: List[Document] = process_html(state["urls"][-1])
     vector_store.add_documents(documents)
     return {"messages": [AIMessage(content="Document uploaded successfully.")]}
@@ -98,8 +113,29 @@ def fetch_from_vectordb(state: AgentState) -> AgentState:
 
 
 @catch_interruption
+def tool_response(state: AgentState) -> AgentState:
+    print("In tool response")
+    tool_decision_response = state["messages"][-1]
+
+    for tool_call in tool_decision_response.tool_calls:
+        name = tool_call.get("name")
+        _args = tool_call.get("args")
+        tool_call_id = tool_call.get("id")
+
+        structured_tool = getattr(chroma_tools, name, None)
+        if structured_tool is None:
+            raise ValueError(f"Tool {name} not found.")
+        tool_result = structured_tool.run(_args)
+
+        # state["messages"].append(tool_result)
+        state["messages"].append(
+            ToolMessage(content=tool_result, name=name, tool_call_id=tool_call_id)
+        )
+    return {"intent": ["none"], "urls": ["none"]}
+
+
+@catch_interruption
 def ai_response(state: AgentState, llm: Any) -> AgentState:
-    # TODO: do I shortcut tool call?
     if not state["content"]:
         response = llm.invoke(state["messages"])
     else:
@@ -111,4 +147,8 @@ def ai_response(state: AgentState, llm: Any) -> AgentState:
     if state.get("verbose", False):
         console.print(state, style=config.get("verbose-color"))
 
-    return {"messages": [AIMessage(content=response.content)]}
+    return {
+        "messages": [AIMessage(content=response.content)],
+        "intent": ["none"],
+        "urls": ["none"],
+    }
