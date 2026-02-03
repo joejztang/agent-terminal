@@ -10,6 +10,7 @@ from src.nodes.nodes import (  # tool_decision,
     router,
     tool_response,
     upload_html_to_vectordb,
+    upload_pdf_to_vectordb,
 )
 from src.utils.util import CONTINUE, EXIT
 
@@ -21,7 +22,8 @@ def agent_graph(llm: Any) -> StateGraph:
     graph.add_node("router", lambda state: router(state, llm))
     # graph.add_node("tool_decision", lambda state: tool_decision(state, llm))
     graph.add_node("ai_response", lambda state: ai_response(state, llm))
-    graph.add_node("upload_to_vectordb", upload_html_to_vectordb)
+    graph.add_node("upload_html_to_vectordb", upload_html_to_vectordb)
+    graph.add_node("upload_pdf_to_vectordb", upload_pdf_to_vectordb)
     graph.add_node("fetch_from_vectordb", fetch_from_vectordb)
     graph.add_node("tool_response", tool_response)
 
@@ -36,7 +38,8 @@ def agent_graph(llm: Any) -> StateGraph:
             EXIT: END,
             # "show_fulltexts": "show_chroma_embedding_fulltext_search_content",
             "tool_calls": "tool_response",
-            "upload_to_vectordb": "upload_to_vectordb",
+            "upload_html_to_vectordb": "upload_html_to_vectordb",
+            "upload_pdf_to_vectordb": "upload_pdf_to_vectordb",
             "fetch_from_vectordb": "fetch_from_vectordb",
             "none": "ai_response",
         },

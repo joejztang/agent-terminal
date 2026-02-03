@@ -12,3 +12,5 @@ wheels/
 # custom
 **.png
 **chroma_langchain_db/
+pdfs/to_upload/*.pdf
+pdfs/uploaded/*.pdf

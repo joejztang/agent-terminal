@@ -4,11 +4,34 @@ from typing import List
 
 from bs4 import BeautifulSoup
 from langchain.tools import tool
-from langchain_community.document_loaders import RecursiveUrlLoader, WebBaseLoader
+from langchain_community.document_loaders import (
+    PyMuPDFLoader,
+    RecursiveUrlLoader,
+    WebBaseLoader,
+)
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from src.utils.util import HTML_CHUNK_OVERLAP, HTML_CHUNK_SIZE, MAX_DEPTH
+from src.utils.util import (
+    HTML_CHUNK_OVERLAP,
+    HTML_CHUNK_SIZE,
+    MAX_DEPTH,
+    PDF_CHUNK_OVERLAP,
+    PDF_CHUNK_SIZE,
+)
+
+
+def process_pdf(path) -> List[Document]:
+    loader = PyMuPDFLoader(path)
+    docs = loader.load()
+
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=PDF_CHUNK_SIZE, chunk_overlap=PDF_CHUNK_OVERLAP
+    )
+    texts = text_splitter.split_documents(docs)
+    for doc in texts:
+        doc.metadata["created_at"] = int(datetime.now().timestamp())
+    return texts
 
 
 def bs4_extractor(html: str) -> str:

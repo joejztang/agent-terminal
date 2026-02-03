@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from rich.console import Console
@@ -13,15 +14,15 @@ console = Console()
 with open(f"{parent_directory}/config.yaml", "r") as f:
     config = safe_load(f)
 
+PDFS_PATH = os.path.abspath(os.path.join(parent_directory, "../..", "pdfs/to_upload"))
 EXIT = "exit"
 CONTINUE = "continue"
-UPLOAD = "upload_to_vectordb"
-FETCH = "fetch_from_vectordb"
-NO_ACTION = "none"
 
 MAX_DEPTH = 2
 HTML_CHUNK_SIZE = 250
 HTML_CHUNK_OVERLAP = 50
+PDF_CHUNK_SIZE = 250
+PDF_CHUNK_OVERLAP = 50
 
 
 def initialize_state() -> AgentState:
